@@ -1,88 +1,127 @@
+let carrito = [];
 
+// Función para cargar productos desde el JSON y generar el menú dinámicamente
+function cargarProductos() {
+  fetch('../assets/data/productos.json')
+    .then((response) => response.json())
+    .then((productos) => {
+      console.log('Productos cargados:', productos); // Verificar que los productos se carguen
+      generarMenu(productos);
+    })
+    .catch((error) => console.error('Error al cargar los productos:', error));
+}
 
-let carrito = []; 
+// Función para generar el menú en el HTML
+function generarMenu(productos) {
+  const menuContainer = document.getElementById('menu-container');
+  menuContainer.innerHTML = ''; // Limpia el contenedor por si ya tiene contenido
 
+  productos.forEach((producto) => {
+    const productoHTML = `
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm">
+          <img src="${producto.imagen}" class="card-img-top" alt="${producto.nombre}">
+          <div class="card-body text-center">
+            <h3 class="card-title">${producto.nombre}</h3>
+            <p class="card-text">${producto.descripcion}</p>
+            <p class="card-text fw-bold">$${producto.precio}</p>
+            <button class="btn btn-primary agregar-carrito" 
+                    data-nombre="${producto.nombre}" 
+                    data-precio="${producto.precio}">
+              Agregar al carrito
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    menuContainer.innerHTML += productoHTML;
+  });
 
+  // Agrega los eventos a los botones de "Agregar al carrito"
+  const botonesAgregar = document.querySelectorAll('.agregar-carrito');
+  botonesAgregar.forEach((boton) =>
+    boton.addEventListener('click', agregarProducto)
+  );
+}
+
+// Función para agregar un producto al carrito
 function agregarProducto(event) {
-    const boton = event.target;
-    const nombre = boton.getAttribute('data-nombre');
-    const precio = parseInt(boton.getAttribute('data-precio'));
+  const boton = event.target;
+  const nombre = boton.getAttribute('data-nombre');
+  const precio = parseInt(boton.getAttribute('data-precio'));
 
- 
-    const producto = { nombre, precio };
+  const producto = { nombre, precio };
+  carrito.push(producto);
 
+  localStorage.setItem('carrito', JSON.stringify(carrito));
 
-    carrito.push(producto);
+  actualizarCarrito();
 
-    localStorage.setItem('carrito', JSON.stringify(carrito));
-
-    actualizarCarrito();
-
-    console.log(`Producto agregado: ${nombre}, Precio: ${precio}`);
+  Swal.fire({
+    title: 'Producto agregado',
+    text: `${nombre} ha sido añadido al carrito.`,
+    icon: 'success',
+    confirmButtonText: 'OK',
+  });
 }
 
+// Función para actualizar el carrito en el HTML
 function actualizarCarrito() {
-    const carritoContainer = document.getElementById('carrito');
-    carritoContainer.innerHTML = ''; 
+  const carritoContainer = document.getElementById('carrito');
+  carritoContainer.innerHTML = '';
 
-    if (carrito.length === 0) {
-        carritoContainer.innerHTML = '<p class="text-center">No hay productos en el carrito</p>';
-        return;
-    }
+  if (carrito.length === 0) {
+    carritoContainer.innerHTML = '<p class="text-center">No hay productos en el carrito</p>';
+    return;
+  }
 
-    carrito.forEach((producto, index) => {
-        const productoHTML = `
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <p>${producto.nombre} - $${producto.precio}</p>
-                <button class="btn btn-danger btn-sm eliminar-producto" data-index="${index}">Eliminar</button>
-            </div>
-        `;
-        carritoContainer.innerHTML += productoHTML;
-    });
+  carrito.forEach((producto, index) => {
+    const productoHTML = `
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <p>${producto.nombre} - $${producto.precio}</p>
+        <button class="btn btn-danger btn-sm eliminar-producto" data-index="${index}">Eliminar</button>
+      </div>
+    `;
+    carritoContainer.innerHTML += productoHTML;
+  });
 
-
-    const botonesEliminar = document.querySelectorAll('.eliminar-producto');
-    botonesEliminar.forEach((boton) =>
-        boton.addEventListener('click', eliminarProducto)
-    );
+  // Agrega eventos a los botones de "Eliminar producto"
+  const botonesEliminar = document.querySelectorAll('.eliminar-producto');
+  botonesEliminar.forEach((boton) =>
+    boton.addEventListener('click', eliminarProducto)
+  );
 }
 
-
+// Función para eliminar un producto del carrito
 function eliminarProducto(event) {
-    const index = event.target.getAttribute('data-index');
-    carrito.splice(index, 1); 
+  const index = event.target.getAttribute('data-index');
+  carrito.splice(index, 1);
 
+  localStorage.setItem('carrito', JSON.stringify(carrito));
 
-    localStorage.setItem('carrito', JSON.stringify(carrito));
+  actualizarCarrito();
 
-
-    actualizarCarrito();
-
-    console.log(`Producto en el índice ${index} eliminado`);
+  Swal.fire({
+    title: 'Producto eliminado',
+    text: `El producto ha sido eliminado del carrito.`,
+    icon: 'info',
+    confirmButtonText: 'OK',
+  });
 }
 
-
+// Inicializa la aplicación
 function inicializar() {
-    console.log("Inicializando el carrito...");
+  console.log('Inicializando la aplicación...');
 
+  const carritoGuardado = JSON.parse(localStorage.getItem('carrito'));
+  if (Array.isArray(carritoGuardado)) {
+    carrito = carritoGuardado;
+  } else {
+    carrito = [];
+  }
 
-    const carritoGuardado = JSON.parse(localStorage.getItem('carrito'));
-    if (Array.isArray(carritoGuardado)) {
-        carrito = carritoGuardado;
-    } else {
-        carrito = [];
-    }
-
-
-    actualizarCarrito();
-
-
-    const botonesAgregar = document.querySelectorAll('.agregar-carrito');
-    console.log(`Botones encontrados: ${botonesAgregar.length}`);
-    botonesAgregar.forEach((boton) =>
-        boton.addEventListener('click', agregarProducto)
-    );
+  actualizarCarrito();
+  cargarProductos();
 }
-
 
 window.addEventListener('DOMContentLoaded', inicializar);

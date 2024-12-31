@@ -17,9 +17,11 @@ header {
 }
 
 header h1 {
-    font-size: 55px;
+    font-size: 4rem; /* Tamaño grande */
+    font-weight: bold; /* Texto en negrita */
+    text-align: center; /* Centrar el texto */
+    color: #fff; /* Blanco para mayor contraste */
 }
-
 main section {
     text-align: center;
 }
