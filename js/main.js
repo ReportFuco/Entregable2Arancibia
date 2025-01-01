@@ -1,20 +1,20 @@
 let carrito = [];
 
-// Función para cargar productos desde el JSON y generar el menú dinámicamente
+
 function cargarProductos() {
   fetch('../assets/data/productos.json')
     .then((response) => response.json())
     .then((productos) => {
-      console.log('Productos cargados:', productos); // Verificar que los productos se carguen
+      console.log('Productos cargados:', productos);
       generarMenu(productos);
     })
     .catch((error) => console.error('Error al cargar los productos:', error));
 }
 
-// Función para generar el menú en el HTML
+
 function generarMenu(productos) {
   const menuContainer = document.getElementById('menu-container');
-  menuContainer.innerHTML = ''; // Limpia el contenedor por si ya tiene contenido
+  menuContainer.innerHTML = '';
 
   productos.forEach((producto) => {
     const productoHTML = `
@@ -37,14 +37,14 @@ function generarMenu(productos) {
     menuContainer.innerHTML += productoHTML;
   });
 
-  // Agrega los eventos a los botones de "Agregar al carrito"
+  
   const botonesAgregar = document.querySelectorAll('.agregar-carrito');
   botonesAgregar.forEach((boton) =>
     boton.addEventListener('click', agregarProducto)
   );
 }
 
-// Función para agregar un producto al carrito
+
 function agregarProducto(event) {
   const boton = event.target;
   const nombre = boton.getAttribute('data-nombre');
@@ -65,7 +65,7 @@ function agregarProducto(event) {
   });
 }
 
-// Función para actualizar el carrito en el HTML
+
 function actualizarCarrito() {
   const carritoContainer = document.getElementById('carrito');
   carritoContainer.innerHTML = '';
@@ -85,14 +85,14 @@ function actualizarCarrito() {
     carritoContainer.innerHTML += productoHTML;
   });
 
-  // Agrega eventos a los botones de "Eliminar producto"
+
   const botonesEliminar = document.querySelectorAll('.eliminar-producto');
   botonesEliminar.forEach((boton) =>
     boton.addEventListener('click', eliminarProducto)
   );
 }
 
-// Función para eliminar un producto del carrito
+
 function eliminarProducto(event) {
   const index = event.target.getAttribute('data-index');
   carrito.splice(index, 1);
@@ -109,7 +109,7 @@ function eliminarProducto(event) {
   });
 }
 
-// Inicializa la aplicación
+
 function inicializar() {
   console.log('Inicializando la aplicación...');
 
